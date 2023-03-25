@@ -22,13 +22,17 @@ export default Input;
 const styles = StyleSheet.create({
   input: {
     width: "auto",
+    minWidth: 170,
     marginHorizontal: 16,
     marginBottom: 24,
     borderWidth: 1,
     paddingHorizontal: 16,
     paddingVertical: 10,
-    borderColor: Colors.primary300,
+    borderColor: Colors.tertiary400,
     borderRadius: 10,
+    backgroundColor:  Colors.tertiary400,
+    color: Colors.primary700,
+    fontSize: 15,
   },
   label: {
     marginHorizontal: 16,

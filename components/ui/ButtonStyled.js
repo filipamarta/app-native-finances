@@ -24,26 +24,27 @@ export default ButtonStyled;
 const styles = StyleSheet.create({
   button: {
     minWidth: 166,
-    borderRadius: 4,
+    borderRadius: 30,
     padding: 8,
-    paddingVertical: 10,
-    backgroundColor: Colors.primary500,
+    paddingVertical: 12,
+    backgroundColor: Colors.primary300,
   },
   buttonText: {
-    color: "white",
+    color: Colors.primary700,
     textAlign: "center",
     fontSize: 16,
     fontWeight: "bold",
   },
   buttonFlat: {
-    backgroundColor: "transparent",
+    backgroundColor: Colors.primary700,
+    borderRadius: 30,
   },
   buttonFlatText: {
-    color: Colors.primary700,
+    color: Colors.primary300,
   },
   pressed: {
     opacity: 0.5,
     backgroundColor: Colors.primary100,
-    borderRadius: 4,
+    borderRadius: 30,
   },
 });

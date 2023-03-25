@@ -19,16 +19,20 @@ export default CalendarInput;
 const styles = StyleSheet.create({
   input: {
     width: "auto",
-    marginHorizontal: 16,
+    minWidth: 180,
+    marginRight: 16,
     marginBottom: 24,
     borderWidth: 1,
     paddingHorizontal: 16,
     paddingVertical: 14,
-    borderColor: Colors.primary300,
+    borderColor: Colors.tertiary400,
     borderRadius: 10,
+    backgroundColor: Colors.tertiary400,
+    color: Colors.primary700,
+    fontSize: 15,
   },
   label: {
-    marginHorizontal: 16,
+    marginRight: 16,
     marginBottom: 8,
     fontSize: 16,
     fontWeight: "bold",

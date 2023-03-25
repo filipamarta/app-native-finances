@@ -1,1 +1,1 @@
-export const dateFormatted = (date) => date.toLocaleDateString("en-GB");
+export const dateFormatted = (date) => date?.toLocaleDateString("en-GB");

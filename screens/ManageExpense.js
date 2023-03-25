@@ -19,66 +19,89 @@ import CalendarInput from "../components/ui/CalendarInput";
 const ManageExpense = ({ route, navigation }) => {
   const editExpenseId = route.params?.expenseId;
 
-  const { addExpense, getExpenseById, deleteExpense, updateExpense } =
-    useExpenses();
-
-  const editExpense = getExpenseById(editExpenseId);
-
-  const [description, setDescription] = useState(
-    editExpense ? editExpense.description : ""
-  );
-  const [amount, setAmount] = useState(editExpense ? editExpense.amount : "");
-  const [date, setDate] = useState(editExpense ? editExpense.date : new Date());
-  const [show, setShow] = useState(false);
-
   useLayoutEffect(() => {
     navigation.setOptions({
       title: editExpenseId ? " Edit Expense" : "Add expense",
     });
   }, [navigation]);
 
+  const { addExpense, getExpenseById, deleteExpense, updateExpense } =
+    useExpenses();
+
+  const editExpense = getExpenseById(editExpenseId);
+
+  const [show, setShow] = useState(false);
+
+  const [inputValues, setInputValues] = useState(
+    editExpense
+      ? editExpense
+      : { description: "", amount: "", date: new Date() }
+  );
+
+  const onChangeInputValuesHandler = (
+    inputIdentifier,
+    enteredValue,
+    selectedDate
+  ) => {
+    if (inputIdentifier === "amount" && isNaN(parseInt(enteredValue))) {
+      
+      Alert.alert("Invalid Number", "Write a number", [
+        {
+          text: "Got It",
+          style: "default",
+          onPress: () => setInputValues({...inputValues, amount: ""})
+        },
+      ]);
+    }
+    if (inputIdentifier === "date") {
+      setShow(false);
+    }
+    setInputValues((prev) => {
+      return {
+        ...prev,
+        [inputIdentifier]:
+          inputIdentifier === "date"
+            ? new Date(selectedDate.nativeEvent.timestamp)
+            : enteredValue,
+      };
+    });
+  };
+
   const onPressCancelHandler = () => {
     navigation.goBack();
   };
 
-  const onPressUpdateHandler = () => {
-    updateExpense(description, amount, editExpenseId, date);
-    navigation.goBack();
+  const onPressSubmitHandler = () => {
+    if (editExpenseId) {
+      updateExpense(
+        inputValues.description,
+        inputValues.amount,
+        editExpenseId,
+        inputValues.date
+      );
+      navigation.goBack();
+    } else {
+      if (!inputValues.amount || !inputValues.description) {
+        Alert.alert(
+          "Invalid fields",
+          "To continue, create an expense with an amount and a description.",
+          [{ text: "Got it" }]
+        );
+        return;
+      }
+      addExpense(
+        inputValues.description,
+        inputValues.amount,
+        uuid.v4(),
+        inputValues.date
+      );
+      navigation.goBack();
+    }
   };
 
   const onPressDeleteExpenseHandler = () => {
     deleteExpense(editExpenseId);
     navigation.goBack();
-  };
-
-  const onPressAddHandler = () => {
-    if (!amount || !description) {
-      Alert.alert(
-        "Invalid fields",
-        "To continue, create an expense with an amount and a description.",
-        [{ text: "Got it" }]
-      );
-      return;
-    }
-    addExpense(description, amount, uuid.v4(), date);
-    navigation.goBack();
-  };
-
-  const onChangeInputHandler = (e) => {
-    const number = parseInt(e);
-    if (isNaN(number)) {
-      Alert.alert("Invalid Number", "Write a number", [
-        { text: "Got It", style: "default", onPress: setAmount("") },
-      ]);
-    } else {
-      setAmount(e);
-    }
-  };
-
-  const onChange = (e, selectedDate) => {
-    const currentDate = selectedDate;
-    setShow(false);
-    setDate(currentDate);
   };
 
   const showDatepicker = () => {
@@ -92,32 +115,42 @@ const ManageExpense = ({ route, navigation }) => {
   return (
     <View style={styles.container}>
       <ScrollView>
-        <Input
-          label="Expense amount:"
-          textInputConfig={{
-            value: amount,
-            onChangeText: onChangeInputHandler,
-            placeholder: "0",
-            keyboardType: "decimal-pad",
-            autoComplete: "off",
-            inputMode: "numeric",
-          }}
-        />
-        <CalendarInput date={date} showDatepicker={showDatepicker} />
+        <View style={styles.containerTwoInputs}>
+          <Input
+            label="Amount:"
+            textInputConfig={{
+              value: inputValues.amount,
+              onChangeText: onChangeInputValuesHandler.bind(this, "amount"),
+              placeholder: "0",
+              keyboardType: "decimal-pad",
+              autoComplete: "off",
+              inputMode: "numeric",
+            }}
+          />
+          <CalendarInput
+            date={inputValues.date}
+            showDatepicker={showDatepicker}
+          />
+        </View>
+
         {show && (
           <DateTimePicker
             testID="dateTimePicker"
-            value={date}
+            value={inputValues.date}
             mode="date"
             is24Hour={true}
-            onChange={onChange}
+            onChange={onChangeInputValuesHandler.bind(
+              this,
+              "date",
+              "timestamp"
+            )}
           />
         )}
         <Input
           label="Description (100 characters max):"
           textInputConfig={{
-            value: description,
-            onChangeText: setDescription,
+            value: inputValues.description,
+            onChangeText: onChangeInputValuesHandler.bind(this, "description"),
             placeholder: "",
             inputMode: "text",
             maxLength: 50,
@@ -127,17 +160,12 @@ const ManageExpense = ({ route, navigation }) => {
           }}
         />
         <View style={styles.buttonsContainer}>
+          <ButtonStyled onPress={onPressCancelHandler} text="Cancel" isFlat />
+
           <ButtonStyled
-            onPress={onPressCancelHandler}
-            text="Cancel"
-            isFlat
-            style={{ backgroundColor: Colors.neutral400, borderRadius: 4 }}
+            onPress={onPressSubmitHandler}
+            text={editExpenseId ? "Update" : "Add"}
           />
-          {editExpenseId ? (
-            <ButtonStyled onPress={onPressUpdateHandler} text="Update" />
-          ) : (
-            <ButtonStyled onPress={onPressAddHandler} text="Add" />
-          )}
         </View>
         {editExpenseId && (
           <View style={styles.iconContainer}>
@@ -170,6 +198,14 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     backgroundColor: Colors.tertiary500,
     flex: 1,
+    paddingTop: 60,
+  },
+  containerTwoInputs: {
+    flexDirection: "row",
+    alignItems: "center",
+    flex: 1,
+    width: "100%",
+    justifyContent: "space-around",
   },
   buttonsContainer: {
     flexDirection: "row",
