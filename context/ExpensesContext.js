@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useReducer } from "react";
+import React, { createContext, useContext, useReducer } from 'react';
 
 const defaultValues = {
   expensesList: [],
@@ -10,6 +10,7 @@ const defaultValues = {
   getExpensesListByTimePeriod: (period) => {},
   getExpensesListSortedByDate: () => {},
   getTotalExpenses: (expenses) => number,
+  setExpenses: (expenses) => {},
 };
 
 export const ExpensesContext = createContext(defaultValues);
@@ -21,13 +22,20 @@ export function useExpenses() {
 /* CRUD functions with useReducer */
 export const expensesReducer = (state, action) => {
   switch (action.type) {
-    case "ADD":
+    case 'ADD':
       return [{ ...action.payload }, ...state];
-    case "DELETE":
-      return state.filter((el) => el.id !== action.payload.id);
-    case "UPDATE":
+    case 'DELETE':
+      const filteredList = state.filter((el) => el.id !== action.payload.id);
+      return filteredList;
+    case 'UPDATE':
       const list = state.filter((el) => el.id !== action.payload.id);
       return [{ ...action.payload }, ...list];
+    case 'SET':
+      /* const sortedList = (action.payload).sort((a, b) => {
+          return new Date(b.date) - new Date(a.date);
+        });
+      return sortedList; */
+      return action.payload.reverse();
     default:
       return state;
   }
@@ -52,20 +60,28 @@ const ExpensesContextProvider = ({ children }) => {
     const newList = expensesList.filter((el) => el.id !== id);
     setExpensesList([...newList, { description, amount, id, date }]); 
   };
+
+  const setExpenses = (expenses) => {
+     setExpensesList(expenses)); 
+  }
   */
 
   const [expensesList, dispatch] = useReducer(expensesReducer, []);
 
   const addExpense = (description, amount, id, date) => {
-    dispatch({ type: "ADD", payload: { description, amount, id, date } });
+    dispatch({ type: 'ADD', payload: { description, amount, id, date } });
   };
 
   const deleteExpense = (id) => {
-    dispatch({ type: "DELETE", payload: { id } });
+    dispatch({ type: 'DELETE', payload: { id } });
   };
 
   const updateExpense = (description, amount, id, date) => {
-    dispatch({ type: "UPDATE", payload: { description, amount, id, date } });
+    dispatch({ type: 'UPDATE', payload: { description, amount, id, date } });
+  };
+
+  const setExpenses = (expenses) => {
+    dispatch({ type: 'SET', payload: expenses });
   };
 
   const checkExpenseOnTheList = (id) => {
@@ -77,11 +93,13 @@ const ExpensesContextProvider = ({ children }) => {
   const getExpensesListByTimePeriod = (period) => {
     const currentDate = new Date();
 
-    if (period === "Last 7 days") {
+    if (period === 'Last 7 days') {
       const finalDate = new Date(
         currentDate.setDate(currentDate.getDate() - 7)
       );
-      const newList = expensesList.filter((el) => el.date >= finalDate);
+      const newList = expensesList.filter(
+        (el) => new Date(el.date) >= finalDate
+      );
       return newList;
     }
   };
@@ -113,6 +131,7 @@ const ExpensesContextProvider = ({ children }) => {
         getExpensesListByTimePeriod,
         getExpensesListSortedByDate,
         getTotalExpenses,
+        setExpenses,
       }}
     >
       {children}

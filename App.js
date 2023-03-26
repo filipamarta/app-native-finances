@@ -1,23 +1,66 @@
-import React from "react";
-import { StatusBar } from "expo-status-bar";
-import { StyleSheet, View } from "react-native";
-import ExpensesContextProvider from "./context/ExpensesContext";
-import { NavigationContainer } from "@react-navigation/native";
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import AllExpenses from "./screens/AllExpenses";
-import RecentExpenses from "./screens/RecentExpenses";
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import ManageExpense from "./screens/ManageExpense";
-import Ionicons from "@expo/vector-icons/Ionicons";
-import IconButton from "./components/ui/IconButton";
-import Colors from "./contants/colors";
+import React, { useEffect, useState } from 'react';
+import { StatusBar } from 'expo-status-bar';
+import { StyleSheet, View, Text } from 'react-native';
+import ExpensesContextProvider, {
+  useExpenses,
+} from './context/ExpensesContext';
+import { NavigationContainer } from '@react-navigation/native';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import AllExpenses from './screens/AllExpenses';
+import RecentExpenses from './screens/RecentExpenses';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import ManageExpense from './screens/ManageExpense';
+import Ionicons from '@expo/vector-icons/Ionicons';
+import IconButton from './components/ui/IconButton';
+import Colors from './contants/colors';
+import { getExpensesApi } from './services/expensesApi';
+import LoadingOverlay from './components/ui/LoadingOverlay';
+import ErrorOverlay from './components/ui/ErrorOverlay';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
 const ExpensesOverview = () => {
   const manageExpenseHandler = (navigation) =>
-    navigation.navigate("ManageExpense");
+    navigation.navigate('ManageExpense');
+
+  const { setExpenses } = useExpenses();
+  const [isFetchingDataFromApi, setIsFetchingDataFromApi] = useState(true);
+  const [fetchingDataFromApiError, setFetchingDataFromApiError] = useState('');
+
+  const getExpenses = async () => {
+    try {
+      setIsFetchingDataFromApi(true);
+      const expenses = await getExpensesApi();
+      setExpenses(expenses);
+      setIsFetchingDataFromApi(false);
+    } catch (error) {
+      setIsFetchingDataFromApi(false);
+      setFetchingDataFromApiError('Could not fetch expenses.');
+    }
+  };
+
+  useEffect(() => {
+    getExpenses();
+  }, []);
+
+  const errorHandler = () => {
+    setFetchingDataFromApiError(null);
+    getExpenses();
+  };
+
+  if (fetchingDataFromApiError && !isFetchingDataFromApi) {
+    return (
+      <ErrorOverlay
+        message={fetchingDataFromApiError}
+        onConfirm={errorHandler}
+      />
+    );
+  }
+
+  if (isFetchingDataFromApi) {
+    return <LoadingOverlay />;
+  }
 
   return (
     <Tab.Navigator
@@ -46,8 +89,8 @@ const ExpensesOverview = () => {
         name="RecentExpenses"
         component={RecentExpenses}
         options={{
-          title: "Recent Expenses",
-          tabBarLabel: "Recent",
+          title: 'Recent Expenses',
+          tabBarLabel: 'Recent',
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="cash-outline" size={size} color={color} />
           ),
@@ -57,8 +100,8 @@ const ExpensesOverview = () => {
         name="AllExpenses"
         component={AllExpenses}
         options={{
-          title: "All Expenses",
-          tabBarLabel: "All",
+          title: 'All Expenses',
+          tabBarLabel: 'All',
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="calendar-outline" size={size} color={color} />
           ),
@@ -90,7 +133,7 @@ export default function App() {
             <Stack.Screen
               name="ManageExpense"
               component={ManageExpense}
-              options={{ presentation: "modal" }}
+              options={{ presentation: 'modal' }}
             />
           </Stack.Navigator>
         </NavigationContainer>

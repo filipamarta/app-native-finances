@@ -2,6 +2,7 @@ import React from "react";
 import ExpensesOutput from "../components/ExpensesOutput";
 import { useExpenses } from "../context/ExpensesContext";
 
+
 const PERIOD = "Last 7 days";
 
 const RecentExpenses = () => {

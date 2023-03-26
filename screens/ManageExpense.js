@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, useState } from "react";
+import React, { useLayoutEffect, useState } from 'react';
 import {
   View,
   StyleSheet,
@@ -6,27 +6,36 @@ import {
   Alert,
   Platform,
   ScrollView,
-} from "react-native";
-import { useExpenses } from "../context/ExpensesContext";
-import ButtonStyled from "../components/ui/ButtonStyled";
-import IconButton from "../components/ui/IconButton";
-import Colors from "../contants/colors";
-import DateTimePicker from "@react-native-community/datetimepicker";
-import uuid from "react-native-uuid";
-import Input from "../components/ui/Input";
-import CalendarInput from "../components/ui/CalendarInput";
+} from 'react-native';
+import { useExpenses } from '../context/ExpensesContext';
+import ButtonStyled from '../components/ui/ButtonStyled';
+import IconButton from '../components/ui/IconButton';
+import Colors from '../contants/colors';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import Input from '../components/ui/Input';
+import CalendarInput from '../components/ui/CalendarInput';
+import {
+  addExpenseApi,
+  deleteExpenseApi,
+  updateExpenseApi,
+} from '../services/expensesApi';
+import LoadingOverlay from '../components/ui/LoadingOverlay';
+import ErrorOverlay from '../components/ui/ErrorOverlay';
 
 const ManageExpense = ({ route, navigation }) => {
   const editExpenseId = route.params?.expenseId;
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      title: editExpenseId ? " Edit Expense" : "Add expense",
+      title: editExpenseId ? ' Edit Expense' : 'Add expense',
     });
   }, [navigation]);
 
   const { addExpense, getExpenseById, deleteExpense, updateExpense } =
     useExpenses();
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [apiError, setApiError] = useState('');
 
   const editExpense = getExpenseById(editExpenseId);
 
@@ -35,7 +44,7 @@ const ManageExpense = ({ route, navigation }) => {
   const [inputValues, setInputValues] = useState(
     editExpense
       ? editExpense
-      : { description: "", amount: "", date: new Date() }
+      : { description: '', amount: '', date: new Date() }
   );
 
   const onChangeInputValuesHandler = (
@@ -43,24 +52,23 @@ const ManageExpense = ({ route, navigation }) => {
     enteredValue,
     selectedDate
   ) => {
-    if (inputIdentifier === "amount" && isNaN(parseInt(enteredValue))) {
-      
-      Alert.alert("Invalid Number", "Write a number", [
+    if (inputIdentifier === 'amount' && isNaN(enteredValue)) {
+      Alert.alert('Invalid Number', 'Write a number', [
         {
-          text: "Got It",
-          style: "default",
-          onPress: () => setInputValues({...inputValues, amount: ""})
+          text: 'Got It',
+          style: 'default',
+          onPress: () => setInputValues({ ...inputValues, amount: '' }),
         },
       ]);
     }
-    if (inputIdentifier === "date") {
+    if (inputIdentifier === 'date') {
       setShow(false);
     }
     setInputValues((prev) => {
       return {
         ...prev,
         [inputIdentifier]:
-          inputIdentifier === "date"
+          inputIdentifier === 'date'
             ? new Date(selectedDate.nativeEvent.timestamp)
             : enteredValue,
       };
@@ -71,46 +79,82 @@ const ManageExpense = ({ route, navigation }) => {
     navigation.goBack();
   };
 
-  const onPressSubmitHandler = () => {
-    if (editExpenseId) {
-      updateExpense(
-        inputValues.description,
-        inputValues.amount,
-        editExpenseId,
-        inputValues.date
-      );
-      navigation.goBack();
-    } else {
-      if (!inputValues.amount || !inputValues.description) {
-        Alert.alert(
-          "Invalid fields",
-          "To continue, create an expense with an amount and a description.",
-          [{ text: "Got it" }]
+  const onPressSubmitHandler = async () => {
+    setIsSubmitting(true);
+    try {
+      if (editExpenseId) {
+        const expenseDataToUpdate = {
+          description: inputValues.description,
+          amount: inputValues.amount,
+          id: editExpenseId,
+          date: inputValues.date,
+        };
+        updateExpense(
+          inputValues.description,
+          inputValues.amount,
+          editExpenseId,
+          inputValues.date
         );
-        return;
+        await updateExpenseApi(editExpenseId, expenseDataToUpdate);
+      } else {
+        if (!inputValues.amount || !inputValues.description) {
+          Alert.alert(
+            'Invalid fields',
+            'To continue, create an expense with an amount and a description.',
+            [{ text: 'Got it' }]
+          );
+          return;
+        }
+        const expenseDataToAdd = {
+          description: inputValues.description,
+          amount: inputValues.amount,
+          date: inputValues.date,
+        };
+        const idFromFirebase = await addExpenseApi(expenseDataToAdd);
+        addExpense(
+          inputValues.description,
+          inputValues.amount,
+          idFromFirebase,
+          inputValues.date
+        );
+        setIsSubmitting(true);
       }
-      addExpense(
-        inputValues.description,
-        inputValues.amount,
-        uuid.v4(),
-        inputValues.date
-      );
       navigation.goBack();
+    } catch (error) {
+      setApiError('Could not save expense data, please try again later.');
+      setIsSubmitting(false);
     }
   };
 
-  const onPressDeleteExpenseHandler = () => {
-    deleteExpense(editExpenseId);
-    navigation.goBack();
+  const onPressDeleteExpenseHandler = async () => {
+    setIsSubmitting(true);
+    try {
+      await deleteExpenseApi(editExpenseId);
+      deleteExpense(editExpenseId);
+      navigation.goBack();
+    } catch (error) {
+      setApiError(
+        'Could not delete the selected expense. Please try again later.'
+      );
+      setIsSubmitting(false);
+    }
   };
 
   const showDatepicker = () => {
-    if (Platform.OS === "android") {
+    if (Platform.OS === 'android') {
       setShow(false);
       // for iOS, add a button that closes the picker
     }
     setShow(true);
   };
+
+  if (apiError && !isSubmitting) {
+    return <ErrorOverlay message={apiError} />;
+  }
+
+  if (isSubmitting) {
+    return <LoadingOverlay />;
+  }
 
   return (
     <View style={styles.container}>
@@ -120,11 +164,11 @@ const ManageExpense = ({ route, navigation }) => {
             label="Amount:"
             textInputConfig={{
               value: inputValues.amount,
-              onChangeText: onChangeInputValuesHandler.bind(this, "amount"),
-              placeholder: "0",
-              keyboardType: "decimal-pad",
-              autoComplete: "off",
-              inputMode: "numeric",
+              onChangeText: onChangeInputValuesHandler.bind(this, 'amount'),
+              placeholder: '0',
+              keyboardType: 'decimal-pad',
+              autoComplete: 'off',
+              inputMode: 'numeric',
             }}
           />
           <CalendarInput
@@ -136,13 +180,13 @@ const ManageExpense = ({ route, navigation }) => {
         {show && (
           <DateTimePicker
             testID="dateTimePicker"
-            value={inputValues.date}
+            value={new Date(inputValues.date)}
             mode="date"
             is24Hour={true}
             onChange={onChangeInputValuesHandler.bind(
               this,
-              "date",
-              "timestamp"
+              'date',
+              'timestamp'
             )}
           />
         )}
@@ -150,12 +194,12 @@ const ManageExpense = ({ route, navigation }) => {
           label="Description (100 characters max):"
           textInputConfig={{
             value: inputValues.description,
-            onChangeText: onChangeInputValuesHandler.bind(this, "description"),
-            placeholder: "",
-            inputMode: "text",
+            onChangeText: onChangeInputValuesHandler.bind(this, 'description'),
+            placeholder: '',
+            inputMode: 'text',
             maxLength: 50,
             autoCorrect: false,
-            autoCapitalize: "sentences",
+            autoCapitalize: 'sentences',
             multiline: true,
           }}
         />
@@ -164,7 +208,7 @@ const ManageExpense = ({ route, navigation }) => {
 
           <ButtonStyled
             onPress={onPressSubmitHandler}
-            text={editExpenseId ? "Update" : "Add"}
+            text={editExpenseId ? 'Update' : 'Add'}
           />
         </View>
         {editExpenseId && (
@@ -194,23 +238,23 @@ export default ManageExpense;
 
 const styles = StyleSheet.create({
   container: {
-    width: "100%",
+    width: '100%',
     paddingVertical: 16,
     backgroundColor: Colors.tertiary500,
     flex: 1,
     paddingTop: 60,
   },
   containerTwoInputs: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     flex: 1,
-    width: "100%",
-    justifyContent: "space-around",
+    width: '100%',
+    justifyContent: 'space-around',
   },
   buttonsContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-around",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-around',
     marginTop: 30,
   },
   buttonPressed: {
@@ -220,15 +264,15 @@ const styles = StyleSheet.create({
     paddingTop: 16,
     borderTopWidth: 2,
     marginTop: 30,
-    alignItems: "center",
+    alignItems: 'center',
   },
   iconWrapper: {
     width: 50,
     height: 50,
     backgroundColor: Colors.primary700,
     borderRadius: 100,
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   iconPressed: { opacity: 0.6 },
 });
