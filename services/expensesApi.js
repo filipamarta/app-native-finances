@@ -3,16 +3,17 @@ import axios from 'axios';
 const FIREBASE_BACKEND_URL =
   'https://react-native-finances-default-rtdb.europe-west1.firebasedatabase.app';
 
-export const addExpenseApi = async (expensesData) => {
-  const url = `${FIREBASE_BACKEND_URL}/expenses.json`;
+export const addExpenseApi = async (expensesData, token) => {
+  const url = `${FIREBASE_BACKEND_URL}/expenses.json?auth=${token}`;
   const response = await axios.post(url, expensesData);
   const idFromFirebase = response.data.name;
   return idFromFirebase;
 };
 
-export const getExpensesApi = async () => {
-  const url = `${FIREBASE_BACKEND_URL}/expenses.json`;
+export const getExpensesApi = async (token) => {
+  const url = `${FIREBASE_BACKEND_URL}/expenses.json?auth=${token}`;
   const response = await axios.get(url);
+
   const resData = response.data;
 
   let expenses = [];
@@ -30,12 +31,12 @@ export const getExpensesApi = async () => {
   return expenses;
 };
 
-export const updateExpenseApi = (id, expenseData) => {
-  const url = `${FIREBASE_BACKEND_URL}/expenses/${id}.json`;
+export const updateExpenseApi = (id, expenseData, token) => {
+  const url = `${FIREBASE_BACKEND_URL}/expenses/${id}.json?auth=${token}`;
   return axios.put(url, expenseData);
 };
 
-export const deleteExpenseApi = (id) => {
-  const url = `${FIREBASE_BACKEND_URL}/expenses/${id}.json`;
+export const deleteExpenseApi = (id, token) => {
+  const url = `${FIREBASE_BACKEND_URL}/expenses/${id}.json?auth=${token}`;
   return axios.delete(url);
 };

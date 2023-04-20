@@ -1,6 +1,6 @@
-import React from "react";
-import ExpensesOutput from "../components/ExpensesOutput";
-import { useExpenses } from "../context/ExpensesContext";
+import React from 'react';
+import ExpensesOutput from '../../components/ExpensesOutput';
+import { useExpenses } from '../../context/ExpensesContext';
 
 const AllExpenses = () => {
   const { getExpensesListSortedByDate } = useExpenses();

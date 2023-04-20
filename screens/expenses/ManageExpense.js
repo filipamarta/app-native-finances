@@ -7,23 +7,26 @@ import {
   Platform,
   ScrollView,
 } from 'react-native';
-import { useExpenses } from '../context/ExpensesContext';
-import ButtonStyled from '../components/ui/ButtonStyled';
-import IconButton from '../components/ui/IconButton';
-import Colors from '../contants/colors';
+import { useExpenses } from '../../context/ExpensesContext';
+import ButtonStyled from '../../components/ui/ButtonStyled';
+import IconButton from '../../components/ui/IconButton';
+import Colors from '../../contants/colors';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import Input from '../components/ui/Input';
-import CalendarInput from '../components/ui/CalendarInput';
+import Input from '../../components/ui/Input';
+import CalendarInput from '../../components/ui/CalendarInput';
 import {
   addExpenseApi,
   deleteExpenseApi,
   updateExpenseApi,
-} from '../services/expensesApi';
-import LoadingOverlay from '../components/ui/LoadingOverlay';
-import ErrorOverlay from '../components/ui/ErrorOverlay';
+} from '../../services/expensesApi';
+import LoadingOverlay from '../../components/ui/LoadingOverlay';
+import ErrorOverlay from '../../components/ui/ErrorOverlay';
+import { useAuth } from '../../context/AuthContext';
 
 const ManageExpense = ({ route, navigation }) => {
   const editExpenseId = route.params?.expenseId;
+
+  const { token } = useAuth();
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -95,7 +98,7 @@ const ManageExpense = ({ route, navigation }) => {
           editExpenseId,
           inputValues.date
         );
-        await updateExpenseApi(editExpenseId, expenseDataToUpdate);
+        await updateExpenseApi(editExpenseId, expenseDataToUpdate, token);
       } else {
         if (!inputValues.amount || !inputValues.description) {
           Alert.alert(
@@ -110,7 +113,7 @@ const ManageExpense = ({ route, navigation }) => {
           amount: inputValues.amount,
           date: inputValues.date,
         };
-        const idFromFirebase = await addExpenseApi(expenseDataToAdd);
+        const idFromFirebase = await addExpenseApi(expenseDataToAdd, token);
         addExpense(
           inputValues.description,
           inputValues.amount,
@@ -129,7 +132,7 @@ const ManageExpense = ({ route, navigation }) => {
   const onPressDeleteExpenseHandler = async () => {
     setIsSubmitting(true);
     try {
-      await deleteExpenseApi(editExpenseId);
+      await deleteExpenseApi(editExpenseId, token);
       deleteExpense(editExpenseId);
       navigation.goBack();
     } catch (error) {
