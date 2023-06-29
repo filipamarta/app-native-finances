@@ -6,17 +6,19 @@ A React Native expo app experience using firebase as database to manage finances
 
 ## Screens
 
-![all expenses screen](https://github.com/filipamarta/app-native-finances/blob/main/assets/all-expenses.png | width=200)
+<div style="width:200px ; height:600px">
+![all expenses screen](https://github.com/filipamarta/app-native-finances/blob/main/assets/all-expenses.png)
+<div>
 
-![edit expense screen](https://github.com/filipamarta/app-native-finances/blob/main/assets/edit-expenses.png | width=200)
+![edit expense screen](https://github.com/filipamarta/app-native-finances/blob/main/assets/edit-expenses.png)
 
-![7 days expenses screen](https://github.com/filipamarta/app-native-finances/blob/main/assets/7-days-expenses.png | width=200)
+![7 days expenses screen](https://github.com/filipamarta/app-native-finances/blob/main/assets/7-days-expenses.png)
 
-![login screen](https://github.com/filipamarta/app-native-finances/blob/main/assets/login.png | width=200)
+![login screen](https://github.com/filipamarta/app-native-finances/blob/main/assets/login.png)
 
-![logout screen](https://github.com/filipamarta/app-native-finances/blob/main/assets/logout.png | width=200)
+![logout screen](https://github.com/filipamarta/app-native-finances/blob/main/assets/logout.png)
 
-![sign up screen](https://github.com/filipamarta/app-native-finances/blob/main/assets/sign-up.png | width=200)
+![sign up screen](https://github.com/filipamarta/app-native-finances/blob/main/assets/sign-up.png)
 
 ## Installation
 
