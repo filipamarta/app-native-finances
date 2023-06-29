@@ -6,7 +6,7 @@ A React Native expo app experience using firebase as database to manage finances
 
 ## Screens
 
-<img src="https://github.com/filipamarta/app-native-finances/blob/main/assets/all-expenses.png" height="252" width="545" >
+<img src="https://github.com/filipamarta/app-native-finances/blob/main/assets/all-expenses.png" height="545" width="252" >
 
 ![all expenses screen](https://github.com/filipamarta/app-native-finances/blob/main/assets/all-expenses.png)
 
