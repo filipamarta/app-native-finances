@@ -2,23 +2,33 @@
 
 A React Native expo app experience using firebase as database to manage finances and login users.
 
-![finances app](https://github.com/filipamarta/app-native-finances/blob/main/assets/finances.gif)
+<img src="https://github.com/filipamarta/app-native-finances/blob/main/assets/finances.gif" height="545" width="252" >
 
 ## Screens
 
+###### All expenses screen
+
 <img src="https://github.com/filipamarta/app-native-finances/blob/main/assets/all-expenses.png" height="545" width="252" >
 
-![all expenses screen](https://github.com/filipamarta/app-native-finances/blob/main/assets/all-expenses.png)
+###### Edit expense screen
 
-![edit expense screen](https://github.com/filipamarta/app-native-finances/blob/main/assets/edit-expenses.png)
+<img src="https://github.com/filipamarta/app-native-finances/blob/main/assets/edit-expenses.png" height="545" width="252" >
 
-![7 days expenses screen](https://github.com/filipamarta/app-native-finances/blob/main/assets/7-days-expenses.png)
+###### 7 days expenses screen
 
-![login screen](https://github.com/filipamarta/app-native-finances/blob/main/assets/login.png)
+<img src="https://github.com/filipamarta/app-native-finances/blob/main/assets/7-days-expenses.png" height="545" width="252" >
 
-![logout screen](https://github.com/filipamarta/app-native-finances/blob/main/assets/logout.png)
+###### Login screen
 
-![sign up screen](https://github.com/filipamarta/app-native-finances/blob/main/assets/sign-up.png)
+<img src="https://github.com/filipamarta/app-native-finances/blob/main/assets/login.png" height="545" width="252" >
+
+###### Sign up screen
+
+<img src="https://github.com/filipamarta/app-native-finances/blob/main/assets/sign-up.png" height="545" width="252" >
+
+###### Logout screen
+
+<img src="https://github.com/filipamarta/app-native-finances/blob/main/assets/logout.pngg" height="545" width="252" >
 
 ## Installation
 
