@@ -12,7 +12,7 @@ A React Native expo app experience using firebase as database to manage finances
 
 ###### Edit expense screen
 
-<img src="https://github.com/filipamarta/app-native-finances/blob/main/assets/edit-expenses.png" height="545" width="252" >
+<img src="https://github.com/filipamarta/app-native-finances/blob/main/assets/edit-expense.png" height="545" width="252" >
 
 ###### 7 days expenses screen
 
@@ -28,7 +28,7 @@ A React Native expo app experience using firebase as database to manage finances
 
 ###### Logout screen
 
-<img src="https://github.com/filipamarta/app-native-finances/blob/main/assets/logout.pngg" height="545" width="252" >
+<img src="https://github.com/filipamarta/app-native-finances/blob/main/assets/logout.png" height="545" width="252" >
 
 ## Installation
 
